@@ -3,13 +3,17 @@
 <head><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
 <body style="font-family:sans-serif;background:#0A1628;color:#EEF4FB;padding:30px;text-align:center;">
 <h2>🔄 Limpiar sesión</h2>
-<button onclick="clear()" style="background:#74ACDF;color:#003087;border:none;padding:16px 32px;border-radius:10px;font-size:16px;font-weight:700;width:100%;cursor:pointer;margin-top:20px;">Limpiar y volver al inicio</button>
+<div id="msg" style="color:#7A9CC0;font-size:13px;margin-bottom:20px;">Tocá el botón para limpiar tu sesión y volver al inicio.</div>
+<button id="btn" style="background:#74ACDF;color:#003087;border:none;padding:16px 32px;border-radius:10px;font-size:16px;font-weight:700;width:100%;cursor:pointer;">Limpiar y volver al inicio</button>
 <script>
-function clear(){
+document.getElementById('btn').addEventListener('click', function(){
   localStorage.removeItem('mw26u');
   localStorage.removeItem('mw26seen');
-  window.location.href = 'https://JaviBeltra.github.io/mundial2026';
-}
+  document.getElementById('msg').textContent = 'Sesión limpiada. Redirigiendo...';
+  setTimeout(function(){
+    window.location.href = 'https://JaviBeltra.github.io/mundial2026';
+  }, 500);
+});
 </script>
 </body>
 </html>
