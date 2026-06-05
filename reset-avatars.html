@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="font-family:sans-serif;background:#0A1628;color:#EEF4FB;padding:30px;text-align:center;">
+<h2>🖼 Resetear fotos de perfil</h2>
+<p style="color:#7A9CC0;font-size:13px;">Borra las fotos viejas de Ana y Javier para que usen las fotos de GitHub.</p>
+<button id="btn" style="background:#74ACDF;color:#003087;border:none;padding:16px 32px;border-radius:10px;font-size:16px;font-weight:700;width:100%;cursor:pointer;margin-top:16px;">Resetear fotos</button>
+<div id="msg" style="margin-top:20px;font-size:14px;color:#aaa;line-height:2;"></div>
+<script>
+var DB = 'https://mundial2026-a0eec-default-rtdb.firebaseio.com';
+document.getElementById('btn').addEventListener('click', function(){
+  var msg = document.getElementById('msg');
+  msg.textContent = 'Reseteando...';
+  Promise.all([
+    fetch(DB+'/players/usr_ana/avatar.json', {method:'PUT', headers:{'Content-Type':'application/json'}, body:'""'}),
+    fetch(DB+'/players/usr_javier/avatar.json', {method:'PUT', headers:{'Content-Type':'application/json'}, body:'""'})
+  ]).then(function(){
+    msg.innerHTML = '✅ <strong style="color:#4ADE80;">Listo. Las fotos de Ana y Javier ahora usan las imágenes de GitHub.</strong>';
+  }).catch(function(e){
+    msg.textContent = '❌ Error: ' + e.message;
+  });
+});
+</script>
+</body>
+</html>
