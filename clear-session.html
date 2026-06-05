@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="font-family:sans-serif;background:#0A1628;color:#EEF4FB;padding:30px;text-align:center;">
+<h2>🔄 Limpiar sesión</h2>
+<button onclick="clear()" style="background:#74ACDF;color:#003087;border:none;padding:16px 32px;border-radius:10px;font-size:16px;font-weight:700;width:100%;cursor:pointer;margin-top:20px;">Limpiar y volver al inicio</button>
+<script>
+function clear(){
+  localStorage.removeItem('mw26u');
+  localStorage.removeItem('mw26seen');
+  window.location.href = 'https://JaviBeltra.github.io/mundial2026';
+}
+</script>
+</body>
+</html>
