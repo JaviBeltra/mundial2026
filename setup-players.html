@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{font-family:sans-serif;background:#0A1628;color:#EEF4FB;padding:30px;text-align:center;}
+button{background:#74ACDF;color:#003087;border:none;padding:16px 32px;border-radius:10px;font-size:16px;font-weight:700;margin:10px;width:100%;cursor:pointer;}
+#msg{margin-top:20px;font-size:14px;color:#aaa;line-height:1.8;}
+</style>
+</head>
+<body>
+<h2>⚽ Crear jugadores</h2>
+<p style="color:#7A9CC0;font-size:13px;">Carga los 15 jugadores en Firebase.</p>
+<button onclick="setup()">Crear jugadores</button>
+<div id="msg"></div>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyBfEQ8q90gXCnj_Qj_2-I7kVeU7Y0HANIU",
+  authDomain:"mundial2026-a0eec.firebaseapp.com",
+  databaseURL:"https://mundial2026-a0eec-default-rtdb.firebaseio.com",
+  projectId:"mundial2026-a0eec",
+  storageBucket:"mundial2026-a0eec.firebasestorage.app",
+  messagingSenderId:"90287811582",
+  appId:"1:90287811582:web:f3c2e639878382d0f7a5a0"
+});
+var db = firebase.database();
+
+var PLAYERS = [
+  {id:"usr_nonno",    name:"Nonno",     avatar:"", adminKey:""},
+  {id:"usr_nonna",    name:"Nonna",     avatar:"", adminKey:""},
+  {id:"usr_leticia",  name:"Leticia",   avatar:"", adminKey:""},
+  {id:"usr_javier",   name:"Javier",    avatar:"", adminKey:"javi_admin_2026"},
+  {id:"usr_antonio",  name:"Antonio",   avatar:"", adminKey:""},
+  {id:"usr_lucca",    name:"Lucca",     avatar:"", adminKey:""},
+  {id:"usr_santiago", name:"Santiago",  avatar:"", adminKey:""},
+  {id:"usr_gustavo",  name:"Gustavo",   avatar:"", adminKey:""},
+  {id:"usr_benicio",  name:"Benicio",   avatar:"", adminKey:""},
+  {id:"usr_joaquin",  name:"Joaquín",   avatar:"", adminKey:""},
+  {id:"usr_clara",    name:"Clara",     avatar:"", adminKey:""},
+  {id:"usr_antonela", name:"Antonela",  avatar:"", adminKey:""},
+  {id:"usr_francisco",name:"Francisco", avatar:"", adminKey:""},
+  {id:"usr_ana",      name:"Ana",       avatar:"", adminKey:""},
+  {id:"usr_felipe",   name:"Felipe",    avatar:"", adminKey:""},
+];
+
+async function setup(){
+  var msg = document.getElementById('msg');
+  msg.textContent = 'Creando jugadores...';
+  try {
+    for(var i=0; i<PLAYERS.length; i++){
+      var p = PLAYERS[i];
+      await db.ref('players/'+p.id).set(p);
+      msg.textContent = 'Creando... '+p.name;
+    }
+    msg.innerHTML = '✅ <strong style="color:#4ADE80;">Listo! Los 15 jugadores fueron creados.</strong><br><br>Volvé a la app y vas a ver la lista de nombres.';
+  } catch(e) {
+    msg.textContent = '❌ Error: ' + e.message;
+  }
+}
+</script>
+</body>
+</html>
