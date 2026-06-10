@@ -521,7 +521,7 @@ function renderLogin(){
   sorted.forEach(function(p){
     html+='<div class="pr" data-pid="'+p.id+'">'
       +'<img src="'+(getAvatar(p))+'">'
-      +'<div style="flex:1;"><div style="font-size:15px;font-weight:600;">'+p.name+'</div></div>'
+      +'<div style="flex:1;"><div style="font-size:15px;font-weight:600;">'+esc(p.name)+'</div></div>'
       +'<div style="color:var(--mu);font-size:22px;">›</div>'
       +'</div>';
   });
@@ -639,7 +639,7 @@ function renderMiniTable(){
     return '<div style="display:flex;align-items:center;gap:8px;padding:8px 4px;border-bottom:'+(i<ranked.length-1?'1px solid var(--bd)':'none')+(me?';background:rgba(116,172,223,.05);border-radius:8px;padding-left:8px;':'')+'">'
       +'<span style="font-size:13px;width:20px;text-align:center;">'+(medals[i]||(i+1))+'</span>'
       +'<img src="'+p.avatar+'" style="width:28px;height:28px;border-radius:50%;object-fit:cover;background:var(--s3);">'
-      +'<span style="flex:1;font-size:13px;font-weight:'+(me?700:500)+';overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:'+(me?'var(--cel)':'var(--tx)')+';">'+p.name+'</span>'
+      +'<span style="flex:1;font-size:13px;font-weight:'+(me?700:500)+';overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:'+(me?'var(--cel)':'var(--tx)')+';">'+esc(p.name)+'</span>'
       +'<span class="bebas" style="font-size:19px;color:var(--cel);">'+p.total+'</span>'
       +'</div>';
   }).join('');
@@ -659,7 +659,7 @@ function renderPodio(id,mini){
     html+='<div style="display:flex;flex-direction:column;align-items:center;gap:4px;">'
       +'<span style="font-size:'+(vi===1?'16px':'13px')+'">'+medals[vi]+'</span>'
       +'<img src="'+p.avatar+'" style="width:'+sizes[vi]+';height:'+sizes[vi]+';border-radius:50%;object-fit:cover;background:var(--s3);border:3px solid '+(vi===1?'var(--cel)':'var(--bd)')+';">'
-      +'<span style="font-size:11px;font-weight:600;text-align:center;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:'+(vi===1?'var(--cel)':'var(--tx)')+';">'+p.name+'</span>'
+      +'<span style="font-size:11px;font-weight:600;text-align:center;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:'+(vi===1?'var(--cel)':'var(--tx)')+';">'+esc(p.name)+'</span>'
       +'<div style="width:90px;height:'+heights[vi]+';border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;font-family:Bebas Neue,sans-serif;font-size:24px;background:'+(vi===1?'linear-gradient(180deg,var(--cel),var(--cel2))':vi===0?'linear-gradient(180deg,#9CA3AF,#6B7280)':'linear-gradient(180deg,#CD7C3A,#9A5C25)')+';color:'+(vi===1?'#003087':'#fff')+';">'+p.total+'</div>'
       +'</div>';
   });
@@ -1186,7 +1186,7 @@ function renderStandings(){
     var medals=['🥇','🥈','🥉'];
     row.innerHTML='<div class="bebas" style="font-size:19px;color:'+(i<3?'var(--cel)':'var(--mu)')+';width:22px;text-align:center;">'+(medals[i]||(i+1))+'</div>'
       +'<img src="'+p.avatar+'" style="width:34px;height:34px;border-radius:50%;object-fit:cover;background:var(--s3);flex-shrink:0;">'
-      +'<div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+p.name+(me?' ⭐':'')+'</div>'
+      +'<div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(p.name)+(me?' ⭐':'')+'</div>'
       +'<div style="font-size:10px;color:var(--mu);">'+p.hits+' aciertos · '+p.exact+' exactos · +'+p.cb+' clasif.</div></div>'
       +'<div class="bebas" style="font-size:20px;color:var(--cel);">'+p.total+'</div>';
     list.appendChild(row);
@@ -1747,6 +1747,7 @@ function getTeamFromStandings(m, pos, standings, preds){
 }
 // ─────────────────────────────────────────────────────────────────────────────
 // MODAL/TOAST/UTILS
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function openMod(){document.getElementById('modal-ov').classList.add('on');}
 function closeMod(){document.getElementById('modal-ov').classList.remove('on');}
 var _tt;
