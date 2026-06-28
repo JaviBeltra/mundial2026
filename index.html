@@ -938,6 +938,23 @@ function calcCB(pid){
   });
   return b;
 }
+function calcCBCount(pid){
+  var count=0,preds=S.preds[pid]||{};
+  Object.keys(CLASS_BONUS).forEach(function(ph){
+    MATCHES.filter(function(m){return m.phase===ph;}).forEach(function(m){
+      var pred=preds[m.id]||{};
+      if(m.t1&&m.t2){
+        if(pred.t1&&pred.t1===m.t1) count++;
+        if(pred.t2&&pred.t2===m.t2) count++;
+      } else {
+        var res=S.results[m.id]; if(!res||res.s1===null||res.s1===undefined) return;
+        if(pred.t1&&res.t1&&pred.t1===res.t1) count++;
+        if(pred.t2&&res.t2&&pred.t2===res.t2) count++;
+      }
+    });
+  });
+  return count;
+}
 function calcScore(pid){
   var total=0,hits=0,exact=0,pred=0,cb=0,mb=0;
   var preds=S.preds[pid]||{};
@@ -1050,7 +1067,7 @@ function renderHomeTicker(){
 }
 function renderMiniTable(){
   var el=document.getElementById('h-table'); if(!el) return;
-  var ranked=S.players.map(function(p){var sc=calcScore(p.id);return{id:p.id,name:p.name,avatar:getAvatar(p),total:sc.total,exact:sc.exact,hits:sc.hits,cb:sc.cb};}).sort(tieBreak);
+  var ranked=S.players.map(function(p){var sc=calcScore(p.id);return{id:p.id,name:p.name,avatar:getAvatar(p),total:sc.total,exact:sc.exact,hits:sc.hits,cb:calcCBCount(p.id)};}).sort(tieBreak);
   var medals=['🥇','🥈','🥉'];
   var hdr='<div style="display:flex;align-items:center;gap:8px;padding:2px 4px 4px;">'
     +'<div style="width:20px;"></div><div style="width:28px;"></div>'
@@ -1098,7 +1115,7 @@ function getChampionHtml(pid){
 function renderFixturePodio(){
   var el=document.getElementById('fix-podio-mini'); if(!el) return;
   if(!S.players.length){el.innerHTML='';return;}
-  var ranked=S.players.map(function(p){var sc=calcScore(p.id);return{id:p.id,name:p.name,avatar:getAvatar(p),total:sc.total,exact:sc.exact,hits:sc.hits,cb:sc.cb};}).sort(tieBreak);
+  var ranked=S.players.map(function(p){var sc=calcScore(p.id);return{id:p.id,name:p.name,avatar:getAvatar(p),total:sc.total,exact:sc.exact,hits:sc.hits,cb:calcCBCount(p.id)};}).sort(tieBreak);
   var top3=ranked.slice(0,3);while(top3.length<3)top3.push(null);
   var order=[1,0,2];
   var heights=['55px','70px','44px'];
@@ -1139,7 +1156,7 @@ function tieBreak(a,b){
 function renderPodio(id,mini){
   var el=document.getElementById(id); if(!el) return;
   if(!S.players.length){el.innerHTML='';return;}
-  var ranked=S.players.map(function(p){var sc=calcScore(p.id);return{id:p.id,name:p.name,avatar:getAvatar(p),total:sc.total,exact:sc.exact,hits:sc.hits,cb:sc.cb};}).sort(tieBreak);
+  var ranked=S.players.map(function(p){var sc=calcScore(p.id);return{id:p.id,name:p.name,avatar:getAvatar(p),total:sc.total,exact:sc.exact,hits:sc.hits,cb:calcCBCount(p.id)};}).sort(tieBreak);
   var top3=ranked.slice(0,3);
   while(top3.length<3) top3.push(null);
   // Detect ties between adjacent positions
@@ -1777,7 +1794,7 @@ function autoCascade(uid, mid){
 function renderStandings(){
   renderPodio('s-podio',false);
   var list=document.getElementById('s-list'); if(!list) return;
-  var ranked=S.players.map(function(p){var sc=calcScore(p.id);return{id:p.id,name:p.name,avatar:getAvatar(p),hits:sc.hits,exact:sc.exact,cb:sc.cb,total:sc.total};}).sort(tieBreak);
+  var ranked=S.players.map(function(p){var sc=calcScore(p.id);return{id:p.id,name:p.name,avatar:getAvatar(p),hits:sc.hits,exact:sc.exact,cb:calcCBCount(p.id),total:sc.total};}).sort(tieBreak);
   var colHead='<div style="display:flex;align-items:center;gap:8px;padding:4px 8px;background:rgba(116,172,223,.06);border-radius:8px;margin-bottom:4px;">'
     +'<div style="width:22px;"></div>'
     +'<div style="width:34px;"></div>'
