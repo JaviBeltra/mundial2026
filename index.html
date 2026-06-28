@@ -924,15 +924,10 @@ function calcCB(pid){
   Object.keys(CLASS_BONUS).forEach(function(ph){
     MATCHES.filter(function(m){return m.phase===ph;}).forEach(function(m){
       var pred=preds[m.id]||{};
-      // Bonus fires as soon as real teams are known (m.t1/m.t2), not when match is played
+      // Only award bonus when real teams are confirmed in MATCHES fixture
       if(m.t1&&m.t2){
         if(pred.t1&&pred.t1===m.t1) b+=CLASS_BONUS[ph];
         if(pred.t2&&pred.t2===m.t2) b+=CLASS_BONUS[ph];
-      } else {
-        // Fallback for phases where teams come from results (future rounds)
-        var res=S.results[m.id]; if(!res||res.s1===null||res.s1===undefined) return;
-        if(pred.t1&&res.t1&&pred.t1===res.t1) b+=CLASS_BONUS[ph];
-        if(pred.t2&&res.t2&&pred.t2===res.t2) b+=CLASS_BONUS[ph];
       }
     });
   });
@@ -943,14 +938,12 @@ function calcCBCount(pid){
   Object.keys(CLASS_BONUS).forEach(function(ph){
     MATCHES.filter(function(m){return m.phase===ph;}).forEach(function(m){
       var pred=preds[m.id]||{};
+      // Only count when real teams are confirmed in MATCHES (not from results)
       if(m.t1&&m.t2){
         if(pred.t1&&pred.t1===m.t1) count++;
         if(pred.t2&&pred.t2===m.t2) count++;
-      } else {
-        var res=S.results[m.id]; if(!res||res.s1===null||res.s1===undefined) return;
-        if(pred.t1&&res.t1&&pred.t1===res.t1) count++;
-        if(pred.t2&&res.t2&&pred.t2===res.t2) count++;
       }
+      // Do NOT count from S.results — those have hypothetical teams from pre-tournament picks
     });
   });
   return count;
