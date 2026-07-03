@@ -1580,10 +1580,11 @@ function colorScoreInputs(div, m, pred, res, scored){
   }
   // Real result exists: compare
   var ps1=+pred.s1, ps2=+pred.s2, rs1=+res.s1, rs2=+res.s2;
-  // Determine outcomes
-  var predWinner = ps1>ps2?'t1':ps1<ps2?'t2':'draw';
-  var realWinner = rs1>rs2?'t1':rs1<rs2?'t2':'draw';
-  var exactMatch = ps1===rs1 && ps2===rs2;
+  var ko=PHASES[m.phase]&&PHASES[m.phase].ko;
+  // For KO phases, include penalties in winner determination
+  var predWinner = ps1>ps2?'t1':ps1<ps2?'t2':(ko?(pred.pen||'draw'):'draw');
+  var realWinner = rs1>rs2?'t1':rs1<rs2?'t2':(ko?(res.pen||'draw'):'draw');
+  var exactMatch = ps1===rs1 && ps2===rs2 && predWinner===realWinner;
   var resultMatch = predWinner===realWinner;
   inputs.forEach(function(inp){
     if(exactMatch){
