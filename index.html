@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html><!-- v20260704-r -->
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -1701,8 +1701,8 @@ function buildCard(m){
     +'<input type="number" class="si" value="'+ps2+'" min="0" max="20" placeholder="–" '+(locked?'disabled':'')+' data-mid="'+m.id+'" data-f="s2" data-ph="'+m.phase+'">'
     +'</div>'+t2html+'</div>'
     +(showPen?'<div style="margin-top:8px;"><div style="font-size:11px;color:var(--mu);margin-bottom:5px;">Si empate → ¿quién gana por penales?</div><div style="display:flex;gap:6px;flex-wrap:wrap;">'
-      +'<button class="pb2'+(pred.pen==='t1'?' on':'')+'" data-mid="'+m.id+'" data-pen="t1">'+(isGrp?m.t1:(m.t1||pred.t1||m.l1||'Equipo 1'))+'</button>'
-      +'<button class="pb2'+(pred.pen==='t2'?' on':'')+'" data-mid="'+m.id+'" data-pen="t2">'+(isGrp?m.t2:(m.t2||pred.t2||m.l2||'Equipo 2'))+'</button>'
+      +'<button class="pb2'+(pred.pen==='t1'?' on':'')+'" data-mid="'+m.id+'" data-pen="t1">'+(isGrp?m.t1:(isLaterKO?(pred.t1||m.l1||'Equipo 1'):(m.t1||pred.t1||m.l1||'Equipo 1')))+'</button>'
+      +'<button class="pb2'+(pred.pen==='t2'?' on':'')+'" data-mid="'+m.id+'" data-pen="t2">'+(isGrp?m.t2:(isLaterKO?(pred.t2||m.l2||'Equipo 2'):(m.t2||pred.t2||m.l2||'Equipo 2')))+'</button>'
       +'</div></div>':'')
     +(scored?'<div style="text-align:center;margin-top:6px;font-size:12px;color:var(--mu);">Resultado: <strong style="color:var(--tx);">'+res.s1+'–'+res.s2+'</strong>'+(res.pen?' <span style="font-size:11px;color:var(--mu);">· Penales: <strong style="color:var(--tx);">'+(res.pen==='t1'?m.t1:m.t2)+'</strong></span>':'')+(pts>0?' <span class="pill">+'+pts+' pts</span>':'')+'</div>':'')
     +(locked?'<div style="margin-top:4px;font-size:10px;color:rgba(239,68,68,.5);">🔒 Cerrado</div>':'');
