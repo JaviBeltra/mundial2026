@@ -523,10 +523,10 @@ const MATCHES = [
   {id:'r16_95',phase:'r16',t1:'Argentina',t2:'Egipto',l1:'G. M86',l2:'G. M88',date:'2026-07-07T16:00Z',venue:'Mercedes-Benz Stadium'},
   {id:'r16_96',phase:'r16',t1:'Suiza',t2:'Colombia',l1:'G. M85',l2:'G. M87',date:'2026-07-07T20:00Z',venue:'BC Place, Vancouver'},
   // QF
-  {id:'qf_97',phase:'qf',l1:'G. R16-89',l2:'G. R16-90',date:'2026-07-09T20:00Z',venue:'Gillette Stadium'},
-  {id:'qf_98',phase:'qf',l1:'G. R16-93',l2:'G. R16-94',date:'2026-07-10T19:00Z',venue:'SoFi Stadium, LA'},
-  {id:'qf_99',phase:'qf',l1:'G. R16-91',l2:'G. R16-92',date:'2026-07-11T21:00Z',venue:'Hard Rock Stadium'},
-  {id:'qf_100',phase:'qf',l1:'G. R16-95',l2:'G. R16-96',date:'2026-07-12T01:00Z',venue:'Arrowhead Stadium'},
+  {id:'qf_97',phase:'qf',t1:'Francia',t2:'Marruecos',l1:'G. R16-89',l2:'G. R16-90',date:'2026-07-09T20:00Z',venue:'Gillette Stadium'},
+  {id:'qf_98',phase:'qf',t1:'España',t2:'Bélgica',l1:'G. R16-93',l2:'G. R16-94',date:'2026-07-10T19:00Z',venue:'SoFi Stadium, LA'},
+  {id:'qf_99',phase:'qf',t1:'Brasil',t2:'Inglaterra',l1:'G. R16-91',l2:'G. R16-92',date:'2026-07-11T21:00Z',venue:'Hard Rock Stadium'},
+  {id:'qf_100',phase:'qf',t1:'Argentina',t2:'Suiza',l1:'G. R16-95',l2:'G. R16-96',date:'2026-07-12T01:00Z',venue:'Arrowhead Stadium'},
   // SF
   {id:'sf_101',phase:'sf',l1:'G. QF-97',l2:'G. QF-98',date:'2026-07-14T19:00Z',venue:'AT&T Stadium, Dallas'},
   {id:'sf_102',phase:'sf',l1:'G. QF-99',l2:'G. QF-100',date:'2026-07-15T19:00Z',venue:'Mercedes-Benz Stadium'},
@@ -610,7 +610,7 @@ function showLogin(){
 function showApp(){
   document.getElementById('sc-login').classList.remove('on');
   document.getElementById('sc-app').classList.add('on');
-  curPhase='r16';
+  curPhase='qf';
   goSec('fixture');
 }
 
@@ -1206,13 +1206,18 @@ function renderFixture(){
   var tickerEl=document.getElementById('fix-ticker-text');
   var tickerPips=document.getElementById('fix-ticker-pips');
   if(infoBox){
-    if(curPhase==='r32'||curPhase==='r16'){
+    if(curPhase==='r32'||curPhase==='r16'||curPhase==='qf'){
       infoBox.style.display='block';
-      var phaseKey=curPhase==='r16'?'r16':'r32';
+      var phaseKey=curPhase;
       if(tickerEl&&tickerPips&&tickerEl._phase!==phaseKey){
         tickerEl._phase=phaseKey;
         tickerPips.innerHTML='';
-        var r32msgs=curPhase==='r16'?[
+        var r32msgs=curPhase==='qf'?[
+          '⚽ Cuartos de Final · Editá tus pronósticos hasta 10 min antes de cada partido',
+          '🎟️ Por cada equipo que acertaste que clasificó a QF ganás +1 pt',
+          '📌 El marcador que pongas vale +2 pts si acertás el resultado',
+          '🏆 Solo quedan 4 partidos para la final · ¡Todo puede pasar!'
+        ]:curPhase==='r16'?[
           '⚽ Ya comienzan los 8vos de final · Editá tus pronósticos hasta 10 min antes de cada partido',
           '🎟️ Por cada equipo que acertaste que clasificó a 8vos ganás +1 pt',
           '📌 El marcador que pongas en 8vos vale +2 pts si acertás el resultado',
@@ -1735,9 +1740,9 @@ function getActivePred(uid,mid){
     // For KO phases: always prefer predsKO
     var ko=(S.predsKO[uid]||{})[mid];
     if(ko&&(ko.s1!==null&&ko.s1!==undefined)) return ko;
-    // If real teams are confirmed but no predsKO entry yet,
-    // return empty pred (don't show old hypothetical scores)
-    if(m.t1&&m.t2) return {};
+    // Fall back to original pred (scores only, teams come from match)
+    var orig=(S.preds[uid]||{})[mid]||{};
+    return {s1:orig.s1,s2:orig.s2,pen:orig.pen};
   }
   return (S.preds[uid]||{})[mid]||{};
 }
