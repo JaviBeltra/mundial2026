@@ -610,7 +610,7 @@ function showLogin(){
 function showApp(){
   document.getElementById('sc-login').classList.remove('on');
   document.getElementById('sc-app').classList.add('on');
-  curPhase='qf';
+  curPhase='r16';
   goSec('fixture');
 }
 
@@ -1626,7 +1626,7 @@ function buildCard(m){
     var o1=getOpts(m,1,up).sort(),o2=getOpts(m,2,up).sort();
     var ph1=m.l1||'Equipo 1',ph2=m.l2||'Equipo 2';
     // If real teams are known, show them with user's original pick
-    var hasRealTeams = m.t1 && m.t2;
+    var hasRealTeams = m.t1 && m.t2 && (m.phase==='r32'||m.phase==='r16');
     if(hasRealTeams){
       // Team 1
       var t1hit = pred.t1 && pred.t1===m.t1;
@@ -1740,9 +1740,11 @@ function getActivePred(uid,mid){
     // For KO phases: always prefer predsKO
     var ko=(S.predsKO[uid]||{})[mid];
     if(ko&&(ko.s1!==null&&ko.s1!==undefined)) return ko;
-    // Fall back to original pred (scores only, teams come from match)
+    // For r32/r16: return scores only (real teams come from match fixture)
     var orig=(S.preds[uid]||{})[mid]||{};
-    return {s1:orig.s1,s2:orig.s2,pen:orig.pen};
+    if(m.phase==='r32'||m.phase==='r16') return {s1:orig.s1,s2:orig.s2,pen:orig.pen};
+    // For qf/sf/final: return full original pred including t1/t2
+    return orig;
   }
   return (S.preds[uid]||{})[mid]||{};
 }
