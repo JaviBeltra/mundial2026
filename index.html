@@ -1356,6 +1356,22 @@ function renderFixture(){
   } else {
     matches.forEach(function(m){list.appendChild(buildCard(m));});
   }
+  // Apply any auto-selections queued while building cards (see buildCard).
+  // Guarded with a re-render counter so this can never loop forever even
+  // if something unexpected keeps producing single-option selects.
+  if(window._pendingAutoSelects && window._pendingAutoSelects.length){
+    var pending = window._pendingAutoSelects;
+    window._pendingAutoSelects = [];
+    window._autoSelectRenderGuard = (window._autoSelectRenderGuard||0) + 1;
+    pending.forEach(function(p){ updTeam(p.mid, p.pos, p.val, true); });
+    if(window._autoSelectRenderGuard < 5){
+      renderFixture();
+    } else {
+      console.warn('Auto-select guard tripped — stopped re-rendering to avoid a loop.');
+    }
+    return;
+  }
+  window._autoSelectRenderGuard = 0;
 }
 
 function getOpts(m, pos, userPreds){
@@ -1523,6 +1539,17 @@ function getWinner(matchId, userPreds){
   if(s2>s1) return t2;
   return pred.pen==='t1' ? t1 : pred.pen==='t2' ? t2 : null;
 }
+function getLoser(matchId, userPreds){
+  var pred = userPreds && userPreds[matchId];
+  if(!pred || pred.s1===null || pred.s1===undefined) return null;
+  var s1=+pred.s1, s2=+pred.s2;
+  var t1 = pred.t1 || null;
+  var t2 = pred.t2 || null;
+  if(!t1 || !t2) return null;
+  if(s1>s2) return t2;
+  if(s2>s1) return t1;
+  return pred.pen==='t1' ? t2 : pred.pen==='t2' ? t1 : null;
+}
 
 // Eligible groups for each "Mejor 3°" slot
 var THIRD_ELIGIBLE = {
@@ -1585,13 +1612,15 @@ function getDynamicOpts(matchId, pos, userPreds){
     }
   }
   
-  // For r16, qf, sf, final: use winners of previous round
+  // For r16, qf, sf, final: use winners of previous round.
+  // For tp (3er puesto): use LOSERS of the semifinals instead.
   var feedMatches = BRACKET[matchId];
   if(!feedMatches) return ALL;
   var feedMatch = feedMatches[pos-1];
-  var winner = getWinner(feedMatch, userPreds);
-  if(winner) return [winner];
-  // If no winner yet, show teams that could plausibly come from that match
+  var isThirdPlace = phase === 'tp';
+  var resolved = isThirdPlace ? getLoser(feedMatch, userPreds) : getWinner(feedMatch, userPreds);
+  if(resolved) return [resolved];
+  // If no result yet, show teams that could plausibly come from that match
   var feedPred = userPreds && userPreds[feedMatch];
   if(feedPred && feedPred.t1 && feedPred.t2){
     return [feedPred.t1, feedPred.t2];
@@ -1792,11 +1821,20 @@ function buildCard(m){
     sel.addEventListener('focus',function(){ window._editingFixture=true; });
     sel.addEventListener('blur',function(){ setTimeout(function(){ window._editingFixture=false; },3000); });
     sel.addEventListener('change',function(){updTeam(this.getAttribute('data-mid'),+this.getAttribute('data-team'),this.value);});
-    // Auto-select if only one option available and not already set
+    // Auto-select if only one option available and not already set.
+    // IMPORTANT: this must NOT call updTeam() synchronously here, because updTeam()
+    // triggers a full renderFixture() which rebuilds this very card again — if the
+    // single-option condition is still true (or becomes true again) that causes
+    // infinite recursion and freezes the tab (this was the root cause of the
+    // "Tercer Puesto" tab hanging / showing nothing).
     var opts = sel.querySelectorAll('option[value]:not([value=""])');
     if(opts.length === 1 && !sel.value){
-      sel.value = opts[0].value;
-      updTeam(sel.getAttribute('data-mid'), +sel.getAttribute('data-team'), opts[0].value);
+      var autoMid = sel.getAttribute('data-mid');
+      var autoPos = +sel.getAttribute('data-team');
+      var autoVal = opts[0].value;
+      sel.value = autoVal;
+      if(!window._pendingAutoSelects) window._pendingAutoSelects = [];
+      window._pendingAutoSelects.push({mid:autoMid,pos:autoPos,val:autoVal});
     }
   });
   return div;
@@ -1822,7 +1860,7 @@ function getActivePred(uid,mid){
   }
   return (S.preds[uid]||{})[mid]||{};
 }
-function updTeam(mid,pos,val){
+function updTeam(mid,pos,val,skipRender){
   if(!S.user||isLocked(mid)) return;
   var uid=S.user.id;
   var m=MATCHES.find(function(x){return x.id===mid;});
@@ -1838,7 +1876,7 @@ function updTeam(mid,pos,val){
     fbSavePred(uid,mid,S.preds[uid][mid]);
   }
   autoCascade(uid, mid);
-  renderFixture();
+  if(!skipRender) renderFixture();
 }
 function updPred(mid,field,val,phase){
   if(!S.user||isLocked(mid)) return;
